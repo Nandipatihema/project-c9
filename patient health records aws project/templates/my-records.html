@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Records - Health Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <a href="/dashboard" class="text-xl font-bold text-blue-600 hover:text-blue-700">Health Portal</a>
+                    <span class="text-blue-600 font-medium">My Records</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userEmail" class="text-gray-700"></span>
+                    <a href="/logout"><button 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-300">
+                        Logout
+                    </button></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">My Health Records</h2>
+            
+            <div class="space-y-4">
+                <!-- Category Filter -->
+                <div class="flex gap-4 mb-6">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            id="filterSelect">
+                        <option value="all">All Files</option>
+                        <option value="Medical Reports">Reports</option>
+                        <option value="X-rays">X-ray</option>
+                        <option value="Medical Bills">Medical Bills</option>
+                    </select>
+                    <button 
+                        id="filterBtn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        Show Records
+                    </button>
+                </div>
+
+                <!-- Files List -->
+                <div id="filesList" class="space-y-2">
+                    <!-- Files will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch and display health records based on the selected category
+        function fetchHealthRecords(category = 'all') {
+            fetch(`/get_health_records?category=${category}`)
+                .then(response => response.json())
+                .then(data => {
+                    const filesList = document.getElementById('filesList');
+                    filesList.innerHTML = '';  // Clear the current records
+    
+                    if (data.records && data.records.length > 0) {
+                        data.records.forEach(record => {
+                            const fileElement = document.createElement('div');
+                            fileElement.classList.add('border', 'p-4', 'rounded-lg', 'shadow');
+                            fileElement.innerHTML = `
+                                <h3 class="font-semibold text-gray-800">${record.filename}</h3>
+                                <p class="text-gray-600">Category: ${record.category}</p>
+                                <p class="text-gray-600">Uploaded at: ${new Date(record.uploaded_at).toLocaleString()}</p>
+                                <a href="${record.file_uri}" class="text-blue-600" target="_blank">View File</a>
+                                <button onclick="deleteRecord('${record.file_id}')"
+                                        class="mt-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
+                                    Delete
+                                </button>
+                            `;
+                            filesList.appendChild(fileElement);
+                        });
+                    } else {
+                        filesList.innerHTML = '<p>No records found.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching records:', error);
+                    document.getElementById('filesList').innerHTML = '<p>Error fetching records.</p>';
+                });
+        }
+    
+        // Function to delete a health record
+        function deleteRecord(fileId) {
+            const confirmation = confirm("Are you sure you want to delete this record?");
+            if (!confirmation) return;
+
+            fetch('/delete_health_record', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ file_id: fileId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Record deleted successfully") {
+                    alert("Record deleted successfully");
+                    fetchHealthRecords();  // Reload the records after deletion
+                } else {
+                    alert("Error deleting record: " + (data.error || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting record:', error);
+                alert('Error deleting record');
+            });
+        }
+
+        // Initial fetch for all records
+        fetchHealthRecords();
+    
+        // Event listener for the category filter button
+        document.getElementById('filterBtn').addEventListener('click', function() {
+            const category = document.getElementById('filterSelect').value;
+            fetchHealthRecords(category);
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Health Portal</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- SweetAlert2 library -->
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    <span class="text-xl font-bold text-blue-600">Health Portal</span>
+                    <a href="/myrecords" class="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+                        My Records
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="userEmail" class="text-gray-700"></span>
+                    <a href="/logout"><button
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-300">
+                        Logout
+                    </button></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 gap-8">
+            <!-- Medical Reports Section -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Medical Reports</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8">
+                    <div class="text-center">
+                        <input type="file" id="reportsUpload" class="hidden" accept=".pdf,.doc,.docx">
+                        <label for="reportsUpload" class="cursor-pointer">
+                            <div class="mx-auto h-20 w-20 text-gray-400 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">Upload Medical Reports</span>
+                            <span class="mt-1 block text-sm text-gray-500">PDF, DOC, or DOCX up to 10MB</span>
+                        </label>
+                        <!-- Display the selected file name here -->
+                        <p id="reportFileName" class="mt-2 text-gray-600"></p>
+                    </div>
+                </div>
+                <div id="reportsList" class="mt-6 space-y-2"></div>
+                <button id="uploadReportBtn"
+                        class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300">
+                    Upload Report
+                </button>
+            </div>
+
+            <!-- X-rays Section -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">X-rays</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8">
+                    <div class="text-center">
+                        <input type="file" id="xraysUpload" class="hidden" accept=".jpg,.jpeg,.png">
+                        <label for="xraysUpload" class="cursor-pointer">
+                            <div class="mx-auto h-20 w-20 text-gray-400 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">Upload X-rays</span>
+                            <span class="mt-1 block text-sm text-gray-500">JPG, JPEG, or PNG up to 10MB</span>
+                        </label>
+                        <!-- Display the selected file name here -->
+                        <p id="xrayFileName" class="mt-2 text-gray-600"></p>
+                    </div>
+                </div>
+                <div id="xraysList" class="mt-6 space-y-2"></div>
+                <button id="uploadXrayBtn"
+                        class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300">
+                    Upload X-ray
+                </button>
+            </div>
+
+            <!-- Medical Bills Section -->
+            <div class="bg-white rounded-lg shadow-xl p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Medical Bills</h2>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8">
+                    <div class="text-center">
+                        <input type="file" id="billsUpload" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                        <label for="billsUpload" class="cursor-pointer">
+                            <div class="mx-auto h-20 w-20 text-gray-400 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                </svg>
+                            </div>
+                            <span class="mt-2 block text-sm font-medium text-gray-700">Upload Medical Bills</span>
+                            <span class="mt-1 block text-sm text-gray-500">PDF, JPG, JPEG, or PNG up to 10MB</span>
+                        </label>
+                        <!-- Display the selected file name here -->
+                        <p id="billFileName" class="mt-2 text-gray-600"></p>
+                    </div>
+                </div>
+                <div id="billsList" class="mt-6 space-y-2"></div>
+                <button id="uploadBillBtn"
+                        class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300">
+                    Upload Bill
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function displayFileName(inputId, displayId) {
+                const fileInput = document.getElementById(inputId);
+                const fileNameDisplay = document.getElementById(displayId);
+
+                fileInput.addEventListener("change", function () {
+                    const file = fileInput.files[0];
+                    if (file) {
+                        fileNameDisplay.textContent = `Selected file: ${file.name}`;
+                    } else {
+                        fileNameDisplay.textContent = "";
+                    }
+                });
+            }
+
+            // Display file name for each file input
+            displayFileName("reportsUpload", "reportFileName");
+            displayFileName("xraysUpload", "xrayFileName");
+            displayFileName("billsUpload", "billFileName");
+
+            function uploadFile(inputId, category) {
+                const fileInput = document.getElementById(inputId);
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert("Please select a file.");
+                    return;
+                }
+
+                // Show loading spinner (you can add a visual spinner element here)
+                Swal.fire({
+                    title: 'Uploading...',
+                    html: 'Please wait while your file is being uploaded.',
+                    showConfirmButton: false,
+                    willOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("category", category);
+
+                fetch("/upload_health_record", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(data => {
+                    // Hide loading spinner
+                    Swal.close();
+                    // Show success message
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                    fileInput.value = ""; // Reset input field after upload
+                })
+                .catch(error => {
+                    // Hide loading spinner
+                    Swal.close();
+                    // Show error message
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'There was an issue uploading your file. Please try again.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    console.error("Upload error:", error);
+                });
+            }
+
+            // Fix: Trigger upload only when the button is clicked
+            document.querySelector("#uploadReportBtn").addEventListener("click", function () {
+                uploadFile("reportsUpload", "Medical Reports");
+            });
+
+            document.querySelector("#uploadXrayBtn").addEventListener("click", function () {
+                uploadFile("xraysUpload", "X-rays");
+            });
+
+            document.querySelector("#uploadBillBtn").addEventListener("click", function () {
+                uploadFile("billsUpload", "Medical Bills");
+            });
+        });
+    </script>
+</body>
+</html>
